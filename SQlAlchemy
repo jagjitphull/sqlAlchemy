@@ -1,0 +1,123 @@
+#INSERT
+
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String 
+
+engine = create_engine('sqlite:///college.db', echo=True) 
+
+meta=MetaData()
+
+students = Table('students', meta, Column('id', Integer, primary_key=True), Column('name', String), Column('lastname', String), )
+
+meta.create_all(engine)
+
+ins=students.insert() 
+ins=students.insert().values(name='J', lastname='P') 
+
+conn = engine.connect() 
+
+result = conn.execute(ins)
+
+
+
+################################################################
+
+
+
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String 
+
+engine = create_engine('sqlite:///college.db', echo=True) 
+
+meta=MetaData() 
+
+students = Table('students', meta, Column('id', Integer, primary_key=True), Column('name', String), Column('lastname', String), ) 
+
+s=students.select()
+
+conn = engine.connect()
+result=conn.execute(s)
+for row in result: 
+	print (row)
+
+
+
+from sqlalchemy.sql import text 
+sut=text("select students.name, students.lastname from students where students.name between :x and :y") 
+conn.execute(s, x='A', y='L').fetchall()
+
+###############################################
+
+from sqlalchemy import and_ 
+from sqlalchemy.sql import select 
+
+sutw=select([text("* from students")]).where( and_( text("students.name between :x and :y"), text("students.id>2")
+)
+)
+
+conn.execute(sutw, x='A', y='L').fetchall()
+
+#######################################
+ALIAS
+
+from sqlalchemy.sql import alias, select 
+
+sase=students.alias("a") 
+s=select([sase]).where(sase.c.id>2) 
+conn.execute(s).fetchall()
+
+###################################################
+
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String 
+
+engine = create_engine('sqlite:///college.db', echo=True) 
+
+meta=MetaData() 
+
+students = Table('students', meta, Column('id', Integer, primary_key=True), Column('name', String), Column('lastname', String), ) 
+
+conn = engine.connect()
+
+stmtup=students.update().where(students.c.lastname=='Y').values(lastname='Phull')
+
+conn.execute(stmt) 
+
+sel=students.select() 
+
+conn.execute(sel).fetchall()
+
+
+####################################################################
+#Delete
+
+
+from sqlalchemy.sql.expression import update 
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String 
+
+engine = create_engine('sqlite:///college-1.db', echo=True) 
+
+meta=MetaData()
+
+students = Table('students', meta, Column('id', Integer, primary_key=True), Column('name', String), Column('lastname', String), )
+
+conn = engine.connect() 
+
+stmtdel=students.delete().where(students.c.lastname=='abc') 
+
+conn.execute(stmtdel) 
+
+s=students.select() 
+conn.execute(s).fetchall()
+
+##########################################################
+Multiple tables
+
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, ForeignKey
+
+engine = create_engine('sqlite:///college-2.db', echo=True) 
+
+meta=MetaData() 
+
+students = Table('students', meta, Column('id', Integer, primary_key=True), Column('name', String), Column('lastname', String), ) 
+
+addresses=Table('addresses', meta, Column('id', Integer, primary_key=True), Column('st_id', Integer, ForeignKey('students.id')), Column('postal_add', String), Column('email_add', String)) 
+
+meta.create_all(engine)
